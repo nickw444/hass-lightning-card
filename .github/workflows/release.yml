@@ -1,0 +1,48 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test
+        run: npm test
+
+      - name: Set version from tag
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
+          sed -i "s/^  \"version\": \".*\"/  \"version\": \"${VERSION}\"/" package.json
+          sed -i "s/export const CARD_VERSION = \".*\"/export const CARD_VERSION = \"${VERSION}\"/" src/types.ts
+
+      - name: Build
+        run: npm run build
+
+      - name: Prepare release asset
+        run: cp dist/lightning-proximity-card.js lightning-proximity-card.js
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: v${{ env.VERSION }}
+          files: lightning-proximity-card.js
+          generate_release_notes: true
