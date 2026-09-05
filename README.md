@@ -2,6 +2,8 @@
 
 A Home Assistant Lovelace card for lightning detectors such as the Ecowitt WH57. Visualises strike distance on a one-dimensional axis from home, with activity summaries and trend detection.
 
+![Sparse fixture — strikes on a distance axis with today/1h counts and Approaching trend](docs/sparse-fixture.png)
+
 ## Features
 
 - Horizontal distance axis (home at left, max range at right)
